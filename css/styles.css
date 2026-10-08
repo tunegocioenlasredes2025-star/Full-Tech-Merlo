@@ -31,9 +31,6 @@ h1,h2,h3,h4{font-family:var(--head);line-height:1.1;letter-spacing:-.02em}
 .btn-line:hover{border-color:var(--ink)}
 .ico{width:20px;height:20px;flex:none}
 
-/* demo banner */
-.demo{background:var(--lime);color:#10200A;font-size:13px;font-weight:600;text-align:center;padding:7px 16px}
-
 /* header */
 .hdr{position:sticky;top:0;z-index:50;background:rgba(14,20,18,.95);backdrop-filter:blur(10px);color:#fff;border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;gap:20px;height:70px}

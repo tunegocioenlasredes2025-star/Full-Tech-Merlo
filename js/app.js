@@ -83,7 +83,6 @@ function renderChrome() {
   const page = document.body.dataset.page;
   const open = isOpen();
   document.body.insertAdjacentHTML("afterbegin", `
-    <div class="demo">Demo armada por TNR · Los productos y precios son de ejemplo: el catálogo real lo carga Full Tech.</div>
     <header class="hdr"><div class="wrap nav">
       <a href="index.html" class="logo" aria-label="Full Tech, inicio">${LOGO}</a>
       <nav class="links" id="links">${NAV.map(([h, t]) => `<a href="${h}" class="${h.startsWith(page) ? "on" : ""}">${t}</a>`).join("")}</nav>

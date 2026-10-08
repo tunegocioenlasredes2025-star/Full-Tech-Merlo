@@ -45,7 +45,7 @@ if (!p) {
       <h1>${p.name}</h1>
       <span class="spec">${p.spec}</span>
       <div class="pprice">${money(p.price)}</div>
-      <span class="pnote">Precio de ejemplo · Te confirmamos stock y precio final por WhatsApp.</span>
+      <span class="pnote">Te confirmamos stock y precio final por WhatsApp.</span>
       <p class="desc">${p.desc || ""}</p>
       ${p.opts ? `<div class="opt"><label>${p.opts.label}</label><div class="pills" id="pills">${p.opts.values.map(v => `<button type="button" data-v="${esc(v)}">${v}</button>`).join("")}</div><div class="err" id="optErr">Elegí ${p.opts.label.toLowerCase()} para agregarlo.</div></div>` : ""}
       <div class="buy">
