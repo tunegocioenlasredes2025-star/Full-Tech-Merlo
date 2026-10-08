@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Producto · Full Tech Merlo</title>
+<meta name="description" content="Producto de Full Tech, tienda de celulares y accesorios en Merlo.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Cpath d='M32 14v16' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M21 22a15 15 0 1 0 22 0' fill='none' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="catalogo">
+<main>
+<div class="wrap" style="padding-top:26px">
+  <div class="crumbs dark" id="crumbs"></div>
+</div>
+<div class="wrap pdp" id="pdp"></div>
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="kick">Te puede interesar</span><h2>Más de esta categoría</h2></div><a href="catalogo.html" class="more" id="moreLink">Ver todo →</a></div>
+    <div class="grid" id="related"></div>
+  </div>
+</section>
+</main>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+const p = getProd(params.get("id"));
+if (!p) {
+  $("#pdp").innerHTML = `<div class="empty" style="grid-column:1/-1">Este producto no existe o ya no está disponible.<br><br><a href="catalogo.html" class="btn btn-dark">Ir a la tienda</a></div>`;
+  $("#crumbs").innerHTML = `<a href="index.html">Inicio</a> / <a href="catalogo.html">Tienda</a>`;
+  document.querySelector("section").remove();
+} else {
+  const c = getCat(p.cat);
+  let qty = 1, opt = p.opts ? "" : "";
+  document.title = `${prodName(p)} · Full Tech Merlo`;
+  $("#crumbs").innerHTML = `<a href="index.html">Inicio</a> <span>/</span> <a href="catalogo.html">Tienda</a> <span>/</span> <a href="catalogo.html?cat=${c.id}">${c.name}</a> <span>/</span> <span>${p.name}</span>`;
+  $("#pdp").innerHTML = `
+    <div class="gal ${tone(p)}">${thumb(p)}${p.badge ? `<span class="badge">${p.badge}</span>` : ""}</div>
+    <div>
+      <span class="brand">${p.brand} · ${c.name}</span>
+      <h1>${p.name}</h1>
+      <span class="spec">${p.spec}</span>
+      <div class="pprice">${money(p.price)}</div>
+      <span class="pnote">Precio de ejemplo · Te confirmamos stock y precio final por WhatsApp.</span>
+      <p class="desc">${p.desc || ""}</p>
+      ${p.opts ? `<div class="opt"><label>${p.opts.label}</label><div class="pills" id="pills">${p.opts.values.map(v => `<button type="button" data-v="${esc(v)}">${v}</button>`).join("")}</div><div class="err" id="optErr">Elegí ${p.opts.label.toLowerCase()} para agregarlo.</div></div>` : ""}
+      <div class="buy">
+        <div class="stepper"><button type="button" id="minus" aria-label="Restar">−</button><span id="qty">1</span><button type="button" id="plus" aria-label="Sumar">+</button></div>
+        <button class="btn btn-dark" id="addBtn">${ICONS.cart.replace("<svg", '<svg class="ico"')}Agregar al carrito</button>
+      </div>
+      <div class="buy"><a class="btn btn-wa" style="flex:1" id="askBtn" target="_blank" rel="noopener">${ICONS.wa.replace("<svg", '<svg class="ico"')}Consultar por WhatsApp</a></div>
+      <div class="perks">
+        <div class="perk">${ICONS.store}Retiro en el local</div>
+        <div class="perk">${ICONS.truck}Envíos a coordinar</div>
+        <div class="perk">${ICONS.card}Efectivo o transferencia</div>
+        <div class="perk">${ICONS.shield}Garantía en el local</div>
+      </div>
+      ${p.feats ? `<div class="feats"><h4>Características</h4><ul>${p.feats.map(f => `<li>${f}</li>`).join("")}</ul></div>` : ""}
+    </div>`;
+  const ask = () => $("#askBtn").href = waLink(`Hola Full Tech! Quería consultar por: ${prodName(p)}${opt ? " (" + opt + ")" : ""} — ${money(p.price)}. ¿Tienen stock?`);
+  ask();
+  $("#minus").onclick = () => { qty = Math.max(1, qty - 1); $("#qty").textContent = qty; };
+  $("#plus").onclick = () => { qty++; $("#qty").textContent = qty; };
+  if (p.opts) $("#pills").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    opt = b.dataset.v; document.querySelectorAll("#pills button").forEach(x => x.classList.toggle("on", x === b));
+    $("#optErr").style.display = "none"; ask();
+  });
+  $("#addBtn").onclick = () => {
+    if (p.opts && !opt) { $("#optErr").style.display = "block"; return; }
+    addToCart(p.id, qty, opt);
+  };
+  const rel = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id);
+  const fill = rel.length >= 4 ? rel : rel.concat(PRODUCTS.filter(x => x.featured && x.cat !== p.cat));
+  $("#related").innerHTML = fill.slice(0, 4).map(card).join("");
+  $("#moreLink").href = `catalogo.html?cat=${c.id}`;
+}
+</script>
+</body>
+</html>

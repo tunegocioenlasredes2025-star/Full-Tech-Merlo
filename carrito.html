@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tu carrito · Full Tech Merlo</title>
+<meta name="description" content="Revisá tu pedido y mandalo por WhatsApp a Full Tech.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Cpath d='M32 14v16' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M21 22a15 15 0 1 0 22 0' fill='none' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="carrito">
+<main>
+<div class="phead"><div class="wrap">
+  <div class="crumbs"><a href="index.html">Inicio</a><span>/</span><span>Carrito</span></div>
+  <h1>Tu carrito</h1>
+  <p>Revisá tu pedido, completá tus datos y lo mandamos por WhatsApp. No se cobra nada acá.</p>
+</div></div>
+<div class="wrap cartp" id="cartp">
+  <div class="panel" id="lines"></div>
+  <div class="panel summary" id="summary">
+    <h3>Datos del pedido</h3>
+    <span class="lbl-h">¿Cómo lo querés recibir?</span>
+    <div class="seg">
+      <label><input type="radio" name="mode" value="Retiro en el local" checked><span>Retiro en el local</span></label>
+      <label><input type="radio" name="mode" value="Envío a domicilio"><span>Envío</span></label>
+    </div>
+    <div class="f" id="addrF" style="display:none"><label for="cAddr">Dirección y localidad</label><input id="cAddr" placeholder="Ej: Rivadavia 1234, Merlo" autocomplete="street-address"></div>
+    <span class="lbl-h">¿Cómo pagás?</span>
+    <div class="seg">
+      <label><input type="radio" name="pay" value="Efectivo" checked><span>Efectivo</span></label>
+      <label><input type="radio" name="pay" value="Transferencia"><span>Transferencia</span></label>
+    </div>
+    <div class="f"><label for="cName">Tu nombre</label><input id="cName" placeholder="Nombre y apellido" autocomplete="name"></div>
+    <div class="f"><label for="cNote">Aclaraciones (opcional)</label><textarea id="cNote" placeholder="Ej: el templado es para un A16"></textarea></div>
+    <div class="tot-row"><span>Productos</span><span id="nItems">0</span></div>
+    <div class="tot-row"><span>Envío</span><span id="ship">Sin cargo (retiro)</span></div>
+    <div class="tot-row big"><span>Total</span><b id="total">$0</b></div>
+    <div class="err" id="err"></div>
+    <button class="btn btn-wa" style="width:100%;margin-top:6px" id="send"></button>
+    <small class="fine">Te confirmamos stock y precio final antes de cobrarte.</small>
+  </div>
+</div>
+</main>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+$("#send").innerHTML = ICONS.wa.replace("<svg", '<svg class="ico"') + "Enviar pedido por WhatsApp";
+const val = n => (document.querySelector(`input[name=${n}]:checked`) || {}).value;
+
+function render() {
+  const items = Cart.items();
+  $("#summary").style.display = items.length ? "" : "none";
+  $("#cartp").style.gridTemplateColumns = items.length ? "" : "1fr";
+  if (!items.length) {
+    $("#lines").innerHTML = `<div class="c-empty">${ICONS.cart}<b>Tu carrito está vacío</b>Sumá productos desde la tienda.<br><br><a href="catalogo.html" class="btn btn-dark">Ir a la tienda</a></div>`;
+    return;
+  }
+  $("#lines").innerHTML = `<h3>Productos</h3>` + items.map((l, i) => `
+    <div class="line">
+      <a href="producto.html?id=${l.p.id}" class="th ${tone(l.p)}">${thumb(l.p)}</a>
+      <div><b><a href="producto.html?id=${l.p.id}">${prodName(l.p)}</a></b>
+        <small>${l.opt ? esc(l.opt) + " · " : ""}${money(l.p.price)} c/u</small>
+        <div class="qty"><button data-i="${i}" data-d="-1" aria-label="Restar">−</button><span>${l.q}</span><button data-i="${i}" data-d="1" aria-label="Sumar">+</button></div></div>
+      <div><div class="sub">${money(l.p.price * l.q)}</div><button class="rm" data-i="${i}" data-d="x">Quitar</button></div>
+    </div>`).join("") + `<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px"><a href="catalogo.html" class="btn btn-line">← Seguir comprando</a><button class="btn btn-line" id="clear">Vaciar carrito</button></div>`;
+  $("#nItems").textContent = Cart.count();
+  $("#total").textContent = money(Cart.total());
+}
+$("#lines").addEventListener("click", e => {
+  if (e.target.id === "clear") { if (confirm("¿Vaciar el carrito?")) { Cart.clear(); render(); } return; }
+  const b = e.target.closest("[data-i]"); if (!b) return;
+  const i = +b.dataset.i, list = Cart.read();
+  Cart.set(i, b.dataset.d === "x" ? 0 : list[i].q + +b.dataset.d);
+  render();
+});
+document.addEventListener("change", e => {
+  if (e.target.name === "mode") {
+    const env = val("mode") === "Envío a domicilio";
+    $("#addrF").style.display = env ? "" : "none";
+    $("#ship").textContent = env ? "A coordinar" : "Sin cargo (retiro)";
+  }
+});
+$("#send").onclick = () => {
+  const name = $("#cName").value.trim(), addr = $("#cAddr").value.trim(), mode = val("mode");
+  const err = t => { $("#err").textContent = t; $("#err").style.display = "block"; };
+  if (!name) { err("Poné tu nombre para mandar el pedido."); $("#cName").focus(); return; }
+  if (mode === "Envío a domicilio" && !addr) { err("Poné la dirección para el envío."); $("#cAddr").focus(); return; }
+  $("#err").style.display = "none";
+  const lines = Cart.items().map(l => `• ${l.q} x ${prodName(l.p)}${l.opt ? " (" + l.opt + ")" : ""} — ${money(l.p.price * l.q)}`);
+  let msg = `Hola Full Tech! Quiero hacer este pedido:\n\n${lines.join("\n")}\n\n*Total: ${money(Cart.total())}*\n\n`;
+  msg += `Nombre: ${name}\nEntrega: ${mode}${mode === "Envío a domicilio" ? " — " + addr : ""}\nPago: ${val("pay")}`;
+  const note = $("#cNote").value.trim(); if (note) msg += `\nAclaraciones: ${note}`;
+  msg += `\n\n¿Me confirman stock? Gracias!`;
+  window.open(waLink(msg), "_blank");
+};
+render();
+</script>
+</body>
+</html>

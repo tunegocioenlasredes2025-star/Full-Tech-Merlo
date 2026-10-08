@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Tienda · Full Tech Merlo</title>
+<meta name="description" content="Celulares, fundas, templados, cargadores, auriculares y más. Armá tu carrito y pedí por WhatsApp.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Cpath d='M32 14v16' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M21 22a15 15 0 1 0 22 0' fill='none' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="catalogo">
+<main>
+<div class="phead"><div class="wrap">
+  <div class="crumbs"><a href="index.html">Inicio</a><span>/</span><span id="crumb">Tienda</span></div>
+  <h1 id="title">Tienda</h1>
+  <p id="sub">Elegí, sumá al carrito y mandanos el pedido por WhatsApp.</p>
+</div></div>
+<div class="wrap shop">
+  <aside class="side">
+    <div><h4>Categorías</h4><div class="cl" id="sideCats"></div></div>
+    <div><h4>Marca</h4><div id="brands"></div></div>
+    <div class="help"><b>¿No lo encontrás?</b>Tenemos más cosas en el local. Preguntanos y te decimos si lo tenemos.<br><a href="#" data-wa="Hola Full Tech! Estoy buscando: ">Preguntar por WhatsApp →</a></div>
+  </aside>
+  <div>
+    <div class="mcats" id="mCats"></div>
+    <div class="bar">
+      <span class="count" id="count"></span>
+      <div class="bar-r">
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar: funda, A16, cargador…" aria-label="Buscar productos"></label>
+        <select class="sel" id="sort" aria-label="Ordenar">
+          <option value="rel">Destacados</option><option value="asc">Menor precio</option><option value="desc">Mayor precio</option><option value="az">A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+</main>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+let cat = params.get("cat") || "all";
+let query = params.get("q") || "";
+let sort = "rel";
+const brandsOn = new Set();
+if (cat !== "all" && !CATS.some(c => c.id === cat)) cat = "all";
+$("#q").value = query;
+
+function syncUrl() {
+  const u = new URL(location.href);
+  cat === "all" ? u.searchParams.delete("cat") : u.searchParams.set("cat", cat);
+  query ? u.searchParams.set("q", query) : u.searchParams.delete("q");
+  history.replaceState(null, "", u);
+}
+function renderCats() {
+  const all = [{ id: "all", name: "Todo" }, ...CATS];
+  const n = id => id === "all" ? PRODUCTS.length : PRODUCTS.filter(p => p.cat === id).length;
+  $("#sideCats").innerHTML = all.map(c => `<a href="?cat=${c.id}" data-c="${c.id}" class="${c.id === cat ? "on" : ""}">${c.name}<span>${n(c.id)}</span></a>`).join("");
+  $("#mCats").innerHTML = all.map(c => `<a href="?cat=${c.id}" data-c="${c.id}" class="${c.id === cat ? "on" : ""}">${c.name}</a>`).join("");
+  const c = CATS.find(x => x.id === cat);
+  $("#title").textContent = c ? c.name : "Tienda";
+  $("#crumb").innerHTML = c ? `<a href="catalogo.html">Tienda</a> / ${c.name}` : "Tienda";
+  document.title = (c ? c.name + " · " : "Tienda · ") + "Full Tech Merlo";
+  const pool = PRODUCTS.filter(p => cat === "all" || p.cat === cat);
+  const brands = [...new Set(pool.map(p => p.brand))].sort();
+  [...brandsOn].forEach(b => { if (!brands.includes(b)) brandsOn.delete(b); });
+  $("#brands").innerHTML = brands.map(b => `<label class="chk"><input type="checkbox" value="${b}" ${brandsOn.has(b) ? "checked" : ""}>${b}</label>`).join("");
+}
+function renderGrid() {
+  const q = query.trim().toLowerCase();
+  let list = PRODUCTS.filter(p => (cat === "all" || p.cat === cat) &&
+    (!brandsOn.size || brandsOn.has(p.brand)) &&
+    (!q || `${p.brand} ${p.name} ${p.spec} ${getCat(p.cat).name}`.toLowerCase().includes(q)));
+  if (sort === "asc") list.sort((a, b) => a.price - b.price);
+  if (sort === "desc") list.sort((a, b) => b.price - a.price);
+  if (sort === "az") list.sort((a, b) => a.name.localeCompare(b.name));
+  $("#count").textContent = `${list.length} producto${list.length === 1 ? "" : "s"}`;
+  $("#grid").innerHTML = list.length ? list.map(card).join("") :
+    `<div class="empty">No encontramos "${esc(query)}".<br><br><a class="btn btn-wa" href="${waLink("Hola Full Tech! Estoy buscando: " + query)}" target="_blank" rel="noopener">${ICONS.wa.replace("<svg", '<svg class="ico"')}Preguntanos si lo tenemos</a></div>`;
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-c]"); if (!a) return;
+  e.preventDefault(); cat = a.dataset.c; syncUrl(); renderCats(); renderGrid();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+$("#brands").addEventListener("change", e => { e.target.checked ? brandsOn.add(e.target.value) : brandsOn.delete(e.target.value); renderGrid(); });
+$("#q").addEventListener("input", e => { query = e.target.value; syncUrl(); renderGrid(); });
+$("#sort").addEventListener("change", e => { sort = e.target.value; renderGrid(); });
+renderCats(); renderGrid();
+</script>
+</body>
+</html>

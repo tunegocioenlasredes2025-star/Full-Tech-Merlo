@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>El local · Full Tech Merlo</title>
+<meta name="description" content="Full Tech: Av. Julián M. Castro 785, Merlo. Lunes a sábado de 9:30 a 13 y de 16:30 a 20.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Cpath d='M32 14v16' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M21 22a15 15 0 1 0 22 0' fill='none' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="local">
+<main>
+<div class="phead"><div class="wrap">
+  <div class="crumbs"><a href="index.html">Inicio</a><span>/</span><span>El local</span></div>
+  <h1>Vení a conocernos</h1>
+  <p>Mirá todo en persona, retirá tu pedido o traé tu celu a arreglar.</p>
+</div></div>
+<section>
+  <div class="wrap visit-grid">
+    <div class="visit-card">
+      <img src="img/local.jpg" alt="Frente del local de Full Tech en Merlo">
+      <div class="in">
+        <div class="vrow" id="r1"></div>
+        <div class="vrow" id="r2"></div>
+        <table class="hours" id="hours"></table>
+        <div class="ctas"><a id="mapsBtn" target="_blank" rel="noopener" class="btn btn-lime">Cómo llegar</a><a href="#" data-wa="Hola Full Tech! Quería hacer una consulta." class="btn btn-ghost">WhatsApp</a></div>
+      </div>
+    </div>
+    <div class="map"><iframe loading="lazy" title="Mapa de Full Tech" src="https://maps.google.com/maps?q=Av.%20Juli%C3%A1n%20M.%20Castro%20785%2C%20Merlo%2C%20Buenos%20Aires&z=16&output=embed"></iframe></div>
+  </div>
+</section>
+</main>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+$("#r1").innerHTML = `${ICONS.pin}<div><b>${SHOP.address}</b><span>${SHOP.city}</span></div>`;
+$("#r2").innerHTML = `${ICONS.wa}<div><b><a href="${waLink("Hola Full Tech!")}" target="_blank" rel="noopener">${SHOP.waShow}</a></b><span>WhatsApp para pedidos y consultas</span></div>`;
+$("#mapsBtn").href = SHOP.maps;
+const days = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const hm = m => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+const today = new Date().getDay();
+$("#hours").innerHTML = [1, 2, 3, 4, 5, 6, 0].map(d => {
+  const t = SHOP.hours.filter(h => h[0] === d).map(h => `${hm(h[1])} a ${hm(h[2])}`).join(" y ");
+  return `<tr class="${d === today ? "today" : ""}"><td>${days[d]}</td><td>${t || "Cerrado"}</td></tr>`;
+}).join("");
+</script>
+</body>
+</html>
