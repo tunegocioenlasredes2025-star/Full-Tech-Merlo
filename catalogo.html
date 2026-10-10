@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body data-page="catalogo">
 <main>
@@ -30,7 +30,7 @@
     <div class="bar">
       <span class="count" id="count"></span>
       <div class="bar-r">
-        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar: funda, A16, cargador…" aria-label="Buscar productos"></label>
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar productos" aria-label="Buscar productos"></label>
         <select class="sel" id="sort" aria-label="Ordenar">
           <option value="rel">Destacados</option><option value="asc">Menor precio</option><option value="desc">Mayor precio</option><option value="az">A–Z</option>
         </select>
@@ -40,8 +40,8 @@
   </div>
 </div>
 </main>
-<script src="js/data.js"></script>
-<script src="js/app.js"></script>
+<script src="js/data.js?v=3"></script>
+<script src="js/app.js?v=3"></script>
 <script>
 let cat = params.get("cat") || "all";
 let query = params.get("q") || "";
