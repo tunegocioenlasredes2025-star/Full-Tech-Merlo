@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Panel · Full Tech</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23111'/%3E%3Cpath d='M32 14v16' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M21 22a15 15 0 1 0 22 0' fill='none' stroke='%238CC63F' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css?v=4">
+<link rel="stylesheet" href="css/admin.css?v=4">
+</head>
+<body data-page="admin">
+
+<!-- ingreso -->
+<div class="login" id="login">
+  <form class="login-card" id="loginForm">
+    <div class="logo" style="align-self:center">F<svg viewBox="0 0 24 24" fill="none" stroke="#76AD2C" stroke-width="3.2" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.6 7.2a7.5 7.5 0 1 0 10.8 0"/></svg>ll<em>Tech</em></div>
+    <h1>Panel de la tienda</h1>
+    <p>Ingresá la contraseña para editar el catálogo.</p>
+    <div class="f"><label for="pass">Contraseña</label><input id="pass" type="password" autocomplete="current-password" required></div>
+    <div class="err" id="loginErr"></div>
+    <button class="btn btn-dark" style="width:100%" id="loginBtn">Entrar</button>
+    <a href="index.html" class="back">← Volver a la tienda</a>
+  </form>
+</div>
+
+<!-- panel -->
+<div class="app" id="app" hidden>
+  <header class="a-top">
+    <div class="wrap a-top-in">
+      <b>Panel <span>Full Tech</span></b>
+      <div class="a-top-r">
+        <a href="index.html" target="_blank" rel="noopener" class="a-link">Ver tienda ↗</a>
+        <button class="a-link" id="logout">Salir</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="savebar" id="savebar">
+    <div class="wrap savebar-in">
+      <span id="saveMsg">Todo guardado</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-line sm" id="discard" hidden>Descartar</button>
+        <button class="btn btn-lime sm" id="save" disabled>Guardar cambios</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap a-main">
+    <div class="a-head">
+      <div><h2>Productos</h2><span class="muted" id="count"></span></div>
+      <button class="btn btn-dark" id="newBtn">+ Nuevo producto</button>
+    </div>
+    <div class="a-tools">
+      <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar producto"></label>
+      <select class="sel" id="fCat"></select>
+    </div>
+    <div class="a-list" id="list"></div>
+  </main>
+</div>
+
+<!-- editor -->
+<div class="shade" id="shade"></div>
+<aside class="editor" id="editor" aria-label="Editar producto">
+  <div class="e-head"><h3 id="eTitle">Editar producto</h3><button class="x" id="eClose" aria-label="Cerrar">×</button></div>
+  <form class="e-body" id="eForm">
+    <div class="e-sec">
+      <span class="e-lbl">Fotos</span>
+      <div class="pics" id="pics"></div>
+      <label class="upload"><input type="file" id="file" accept="image/*" multiple hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v4h16v-4"/></svg>
+        <span><b>Subir fotos</b><small>Desde el celu o la compu. La primera es la principal.</small></span></label>
+      <div class="up-status" id="upStatus"></div>
+    </div>
+    <div class="f"><label for="eName">Nombre</label><input id="eName" required placeholder="Ej: Galaxy A16"></div>
+    <div class="row2">
+      <div class="f"><label for="eBrand">Marca</label><input id="eBrand" placeholder="Ej: Samsung"></div>
+      <div class="f"><label for="eCat">Categoría</label><select id="eCat"></select></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="ePrice">Precio ($)</label><input id="ePrice" inputmode="numeric" required placeholder="Ej: 299999"></div>
+      <div class="f"><label for="eBadge">Etiqueta (opcional)</label><input id="eBadge" placeholder="Ej: Oferta, Nuevo"></div>
+    </div>
+    <div class="f"><label for="eSpec">Detalle corto</label><input id="eSpec" placeholder="Ej: Nuevo en caja · 128 GB"></div>
+    <div class="f"><label for="eDesc">Descripción</label><textarea id="eDesc" placeholder="Contá cómo es el producto"></textarea></div>
+    <div class="f"><label for="eFeats">Características <small>(una por renglón)</small></label><textarea id="eFeats" placeholder="Batería de 5.000 mAh&#10;Cámara de 50 MP"></textarea></div>
+    <div class="row2">
+      <div class="f"><label for="eOptLabel">Opción a elegir (opcional)</label><input id="eOptLabel" placeholder="Ej: Color, Modelo"></div>
+      <div class="f"><label for="eOptVals">Valores <small>(separados por coma)</small></label><input id="eOptVals" placeholder="Ej: Negro, Gris, Verde"></div>
+    </div>
+    <div class="toggles">
+      <label class="tg"><input type="checkbox" id="eStock"><span></span>Hay stock</label>
+      <label class="tg"><input type="checkbox" id="eFeat"><span></span>Destacado en el inicio</label>
+    </div>
+  </form>
+  <div class="e-foot">
+    <button class="btn btn-line" id="eDelete" type="button">Borrar</button>
+    <button class="btn btn-dark" id="eOk" type="button">Listo</button>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
+<script src="js/admin.js?v=4"></script>
+</body>
+</html>

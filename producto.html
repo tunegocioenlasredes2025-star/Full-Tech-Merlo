@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=3">
+<link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body data-page="catalogo">
 <main>
@@ -25,44 +25,55 @@
   </div>
 </section>
 </main>
-<script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
 <script>
+READY.then(() => {
 const p = getProd(params.get("id"));
 if (!p) {
   $("#pdp").innerHTML = `<div class="empty" style="grid-column:1/-1">Este producto no existe o ya no está disponible.<br><br><a href="catalogo.html" class="btn btn-dark">Ir a la tienda</a></div>`;
   $("#crumbs").innerHTML = `<a href="index.html">Inicio</a> / <a href="catalogo.html">Tienda</a>`;
   document.querySelector("section").remove();
-} else {
-  const c = getCat(p.cat);
-  let qty = 1, opt = p.opts ? "" : "";
-  document.title = `${prodName(p)} · Full Tech Merlo`;
-  $("#crumbs").innerHTML = `<a href="index.html">Inicio</a> <span>/</span> <a href="catalogo.html">Tienda</a> <span>/</span> <a href="catalogo.html?cat=${c.id}">${c.name}</a> <span>/</span> <span>${p.name}</span>`;
-  $("#pdp").innerHTML = `
-    <div class="gal ${tone(p)}">${thumb(p)}${p.badge ? `<span class="badge">${p.badge}</span>` : ""}</div>
-    <div>
-      <span class="brand">${p.brand} · ${c.name}</span>
-      <h1>${p.name}</h1>
-      <span class="spec">${p.spec}</span>
-      <div class="pprice">${money(p.price)}</div>
-      <span class="pnote">Te confirmamos stock y precio final por WhatsApp.</span>
-      <p class="desc">${p.desc || ""}</p>
-      ${p.opts ? `<div class="opt"><label>${p.opts.label}</label><div class="pills" id="pills">${p.opts.values.map(v => `<button type="button" data-v="${esc(v)}">${v}</button>`).join("")}</div><div class="err" id="optErr">Elegí ${p.opts.label.toLowerCase()} para agregarlo.</div></div>` : ""}
-      <div class="buy">
-        <div class="stepper"><button type="button" id="minus" aria-label="Restar">−</button><span id="qty">1</span><button type="button" id="plus" aria-label="Sumar">+</button></div>
-        <button class="btn btn-dark" id="addBtn">${ICONS.cart.replace("<svg", '<svg class="ico"')}Agregar al carrito</button>
-      </div>
-      <div class="buy"><a class="btn btn-wa" style="flex:1" id="askBtn" target="_blank" rel="noopener">${ICONS.wa.replace("<svg", '<svg class="ico"')}Consultar por WhatsApp</a></div>
-      <div class="perks">
-        <div class="perk">${ICONS.store}Retiro en el local</div>
-        <div class="perk">${ICONS.truck}Envíos a coordinar</div>
-        <div class="perk">${ICONS.card}Efectivo o transferencia</div>
-        <div class="perk">${ICONS.shield}Garantía en el local</div>
-      </div>
-      ${p.feats ? `<div class="feats"><h4>Características</h4><ul>${p.feats.map(f => `<li>${f}</li>`).join("")}</ul></div>` : ""}
-    </div>`;
-  const ask = () => $("#askBtn").href = waLink(`Hola Full Tech! Quería consultar por: ${prodName(p)}${opt ? " (" + opt + ")" : ""} — ${money(p.price)}. ¿Tienen stock?`);
-  ask();
+  return;
+}
+const c = getCat(p.cat), pics = photos(p), ok = inStock(p);
+let qty = 1, opt = "";
+document.title = `${prodName(p)} · Full Tech Merlo`;
+$("#crumbs").innerHTML = `<a href="index.html">Inicio</a> <span>/</span> <a href="catalogo.html">Tienda</a> <span>/</span> <a href="catalogo.html?cat=${c.id}">${c.name}</a> <span>/</span> <span>${esc(p.name)}</span>`;
+$("#pdp").innerHTML = `
+  <div>
+    <div class="gal ${tone(p)}" id="gal">${thumb(p)}${!ok ? `<span class="badge out">Sin stock</span>` : p.badge ? `<span class="badge">${esc(p.badge)}</span>` : ""}</div>
+    ${pics.length > 1 ? `<div class="thumbs" id="thumbs">${pics.map((u, i) => `<button type="button" class="${i ? "" : "on"}" data-u="${esc(u)}"><img src="${esc(u)}" alt="Foto ${i + 1}"></button>`).join("")}</div>` : ""}
+  </div>
+  <div>
+    <span class="brand">${esc(p.brand)} · ${c.name}</span>
+    <h1>${esc(p.name)}</h1>
+    <span class="spec">${esc(p.spec)}</span>
+    <div class="pprice">${money(p.price)}</div>
+    <span class="pnote">${ok ? "Te confirmamos stock y precio final por WhatsApp." : "<b style='color:#B42318'>Sin stock por ahora.</b> Consultanos cuándo vuelve."}</span>
+    <p class="desc">${esc(p.desc || "")}</p>
+    ${p.opts && ok ? `<div class="opt"><label>${esc(p.opts.label)}</label><div class="pills" id="pills">${p.opts.values.map(v => `<button type="button" data-v="${esc(v)}">${esc(v)}</button>`).join("")}</div><div class="err" id="optErr">Elegí ${esc(p.opts.label.toLowerCase())} para agregarlo.</div></div>` : ""}
+    ${ok ? `<div class="buy">
+      <div class="stepper"><button type="button" id="minus" aria-label="Restar">−</button><span id="qty">1</span><button type="button" id="plus" aria-label="Sumar">+</button></div>
+      <button class="btn btn-dark" id="addBtn">${ICONS.cart.replace("<svg", '<svg class="ico"')}Agregar al carrito</button>
+    </div>` : ""}
+    <div class="buy"><a class="btn btn-wa" style="flex:1" id="askBtn" target="_blank" rel="noopener">${ICONS.wa.replace("<svg", '<svg class="ico"')}${ok ? "Consultar por WhatsApp" : "Avisame cuando haya"}</a></div>
+    <div class="perks">
+      <div class="perk">${ICONS.store}Retiro en el local</div>
+      <div class="perk">${ICONS.truck}Envíos a coordinar</div>
+      <div class="perk">${ICONS.card}Efectivo o transferencia</div>
+      <div class="perk">${ICONS.shield}Garantía en el local</div>
+    </div>
+    ${p.feats && p.feats.length ? `<div class="feats"><h4>Características</h4><ul>${p.feats.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>` : ""}
+  </div>`;
+const ask = () => $("#askBtn").href = waLink(`Hola Full Tech! Quería consultar por: ${prodName(p)}${opt ? " (" + opt + ")" : ""} — ${money(p.price)}. ¿Tienen stock?`);
+ask();
+if ($("#thumbs")) $("#thumbs").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  $("#gal img").src = b.dataset.u;
+  document.querySelectorAll("#thumbs button").forEach(x => x.classList.toggle("on", x === b));
+});
+if (ok) {
   $("#minus").onclick = () => { qty = Math.max(1, qty - 1); $("#qty").textContent = qty; };
   $("#plus").onclick = () => { qty++; $("#qty").textContent = qty; };
   if (p.opts) $("#pills").addEventListener("click", e => {
@@ -74,11 +85,12 @@ if (!p) {
     if (p.opts && !opt) { $("#optErr").style.display = "block"; return; }
     addToCart(p.id, qty, opt);
   };
-  const rel = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id);
-  const fill = rel.length >= 4 ? rel : rel.concat(PRODUCTS.filter(x => x.featured && x.cat !== p.cat));
-  $("#related").innerHTML = fill.slice(0, 4).map(card).join("");
-  $("#moreLink").href = `catalogo.html?cat=${c.id}`;
 }
+const rel = PRODUCTS.filter(x => x.cat === p.cat && x.id !== p.id);
+const fill = rel.length >= 4 ? rel : rel.concat(PRODUCTS.filter(x => x.featured && x.cat !== p.cat));
+$("#related").innerHTML = fill.slice(0, 4).map(card).join("");
+$("#moreLink").href = `catalogo.html?cat=${c.id}`;
+});
 </script>
 </body>
 </html>

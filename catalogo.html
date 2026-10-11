@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=3">
+<link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body data-page="catalogo">
 <main>
@@ -40,8 +40,8 @@
   </div>
 </div>
 </main>
-<script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
 <script>
 let cat = params.get("cat") || "all";
 let query = params.get("q") || "";
@@ -90,7 +90,7 @@ document.addEventListener("click", e => {
 $("#brands").addEventListener("change", e => { e.target.checked ? brandsOn.add(e.target.value) : brandsOn.delete(e.target.value); renderGrid(); });
 $("#q").addEventListener("input", e => { query = e.target.value; syncUrl(); renderGrid(); });
 $("#sort").addEventListener("change", e => { sort = e.target.value; renderGrid(); });
-renderCats(); renderGrid();
+READY.then(() => { renderCats(); renderGrid(); });
 </script>
 </body>
 </html>

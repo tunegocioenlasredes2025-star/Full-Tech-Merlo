@@ -6,9 +6,22 @@ const waLink = msg => `https://wa.me/${SHOP.wa}?text=${encodeURIComponent(msg)}`
 const getCat = id => CATS.find(c => c.id === id) || CATS[0];
 const getProd = id => PRODUCTS.find(p => p.id === +id);
 const prodName = p => (p.brand === "Full Tech" ? "" : p.brand + " ") + p.name;
-const thumb = p => p.img ? `<img src="${p.img}" alt="${esc(prodName(p))}" loading="lazy">` : ICONS[p.icon];
-const tone = p => p.img ? "" : getCat(p.cat).t;
+const photos = p => (p.imgs && p.imgs.length ? p.imgs : p.img ? [p.img] : []);
+const thumb = p => photos(p).length ? `<img src="${esc(photos(p)[0])}" alt="${esc(prodName(p))}" loading="lazy">` : (ICONS[p.icon] || ICONS[getCat(p.cat).icon]);
+const tone = p => photos(p).length ? "" : getCat(p.cat).t;
+const inStock = p => p.stock !== false;
 const params = new URLSearchParams(location.search);
+
+/* ---------- catálogo: lo que se cargó desde el panel (si no, el de data.js) ---------- */
+const READY = (async () => {
+  try {
+    const ctrl = new AbortController(); setTimeout(() => ctrl.abort(), 5000);
+    const r = await fetch("/api/catalog", { cache: "no-store", signal: ctrl.signal });
+    if (!r.ok) return;
+    const d = await r.json();
+    if (Array.isArray(d.products) && d.products.length) PRODUCTS.splice(0, PRODUCTS.length, ...d.products);
+  } catch (e) { /* sin conexión al panel: queda el catálogo de data.js */ }
+})();
 
 /* ---------- abierto / cerrado ---------- */
 function isOpen(d = new Date()) {
@@ -46,14 +59,17 @@ function addToCart(id, qty = 1, opt = "") {
 /* ---------- tarjeta de producto ---------- */
 function card(p) {
   const url = `producto.html?id=${p.id}`;
-  return `<article class="prod">
-    <a href="${url}" class="pic ${tone(p)}">${thumb(p)}${p.badge ? `<span class="badge">${p.badge}</span>` : ""}</a>
+  const badge = !inStock(p) ? `<span class="badge out">Sin stock</span>` : p.badge ? `<span class="badge">${esc(p.badge)}</span>` : "";
+  const btn = !inStock(p) ? `<a class="add off" href="${url}">Sin stock</a>`
+    : p.opts ? `<a class="add" href="${url}">Elegir</a>` : `<button class="add" data-add="${p.id}">+ Agregar</button>`;
+  return `<article class="prod${inStock(p) ? "" : " is-out"}">
+    <a href="${url}" class="pic ${tone(p)}">${thumb(p)}${badge}</a>
     <div class="body">
-      <span class="brand">${p.brand}</span>
-      <h3><a href="${url}">${p.name}</a></h3>
-      <span class="spec">${p.spec}</span>
+      <span class="brand">${esc(p.brand)}</span>
+      <h3><a href="${url}">${esc(p.name)}</a></h3>
+      <span class="spec">${esc(p.spec)}</span>
       <div class="foot"><span class="price">${money(p.price)}</span>
-        ${p.opts ? `<a class="add" href="${url}">Elegir</a>` : `<button class="add" data-add="${p.id}">+ Agregar</button>`}</div>
+        ${btn}</div>
     </div>
   </article>`;
 }
@@ -81,6 +97,7 @@ const NAV = [
 ];
 function renderChrome() {
   const page = document.body.dataset.page;
+  if (page === "admin") return;
   const open = isOpen();
   document.body.insertAdjacentHTML("afterbegin", `
     <header class="hdr"><div class="wrap nav">

@@ -10,45 +10,25 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=3">
+<link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body data-page="index">
 <main>
-<section class="hero" style="padding:0">
-  <div class="wrap hero-grid">
-    <div>
-      <span class="kick">Merlo · Tienda de telefonía</span>
-      <h1>Tu celu, sus accesorios y su arreglo, <span>en un solo lugar.</span></h1>
-      <p class="lead">Celulares nuevos en caja, fundas, cargadores, auriculares y servicio técnico. Elegí en la tienda, armá tu carrito y mandanos el pedido por WhatsApp.</p>
-      <div class="ctas">
-        <a href="catalogo.html" class="btn btn-lime">Ir a la tienda <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a href="servicio-tecnico.html" class="btn btn-ghost">Arreglar mi celu</a>
-      </div>
-      <div class="chips">
-        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Nuevos en caja</div>
-        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>Servicio técnico</div>
-        <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></svg>Av. Julián M. Castro 785</div>
-      </div>
-    </div>
-    <div class="hero-pic">
-      <div class="ph"><img src="img/galaxy-a16.jpg" alt="Samsung Galaxy A16 nuevo en caja en Full Tech"></div>
-      <div class="tag"><div class="dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div><div><b>100% nuevo en caja</b>Con garantía</div></div>
-    </div>
-  </div>
-</section>
-<div class="brands"><div class="wrap"><span>SAMSUNG</span><span>motorola</span><span>Xiaomi</span><span>HUAWEI</span><span>ZTE</span><span>Kingston</span><span>Apple</span></div></div>
-
-<section>
+<section class="intro">
   <div class="wrap">
-    <div class="sec-head"><div><span class="kick">Categorías</span><h2>¿Qué estás buscando?</h2></div><a href="catalogo.html" class="more">Ver toda la tienda →</a></div>
+    <div class="intro-top">
+      <h1>Celulares, accesorios y <span>servicio técnico</span></h1>
+      <form class="search" action="catalogo.html" role="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input name="q" type="search" placeholder="Buscar productos" aria-label="Buscar productos"></form>
+    </div>
     <div class="tiles" id="tiles"></div>
   </div>
 </section>
 
-<section style="padding-top:0">
+<section style="padding-top:40px">
   <div class="wrap">
-    <div class="sec-head"><div><span class="kick">Destacados</span><h2>Lo más pedido</h2></div><a href="catalogo.html" class="more">Ver todos los productos →</a></div>
+    <div class="sec-head" style="margin-bottom:22px"><div><span class="kick">Destacados</span><h2>Lo más pedido</h2></div><a href="catalogo.html" class="more">Ver toda la tienda →</a></div>
     <div class="grid" id="featured"></div>
+    <div style="text-align:center;margin-top:26px"><a href="catalogo.html" class="btn btn-dark" id="allBtn">Ver todos los productos</a></div>
   </div>
 </section>
 
@@ -90,14 +70,18 @@
   </div>
 </section>
 </main>
-<script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
 <script>
-$("#tiles").innerHTML = CATS.map(c => {
-  const n = PRODUCTS.filter(p => p.cat === c.id).length;
-  return `<a href="catalogo.html?cat=${c.id}" class="tile ${c.t}">${ICONS[c.icon]}<div><b>${c.name}</b><br><small>${c.desc} · ${n}</small></div></a>`;
-}).join("");
-$("#featured").innerHTML = PRODUCTS.filter(p => p.featured).slice(0, 8).map(card).join("");
+READY.then(() => {
+  $("#tiles").innerHTML = CATS.map(c => {
+    const n = PRODUCTS.filter(p => p.cat === c.id).length;
+    return `<a href="catalogo.html?cat=${c.id}" class="tile ${c.t}">${ICONS[c.icon]}<div><b>${c.name}</b><br><small>${c.desc} · ${n}</small></div></a>`;
+  }).join("");
+  const feat = PRODUCTS.filter(p => p.featured);
+  $("#featured").innerHTML = (feat.length ? feat : PRODUCTS).slice(0, 8).map(card).join("");
+  $("#allBtn").textContent = `Ver los ${PRODUCTS.length} productos`;
+});
 </script>
 </body>
 </html>

@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/styles.css?v=3">
+<link rel="stylesheet" href="css/styles.css?v=4">
 </head>
 <body data-page="carrito">
 <main>
@@ -45,8 +45,8 @@
   </div>
 </div>
 </main>
-<script src="js/data.js?v=3"></script>
-<script src="js/app.js?v=3"></script>
+<script src="js/data.js?v=4"></script>
+<script src="js/app.js?v=4"></script>
 <script>
 $("#send").innerHTML = ICONS.wa.replace("<svg", '<svg class="ico"') + "Enviar pedido por WhatsApp";
 const val = n => (document.querySelector(`input[name=${n}]:checked`) || {}).value;
@@ -62,8 +62,8 @@ function render() {
   $("#lines").innerHTML = `<h3>Productos</h3>` + items.map((l, i) => `
     <div class="line">
       <a href="producto.html?id=${l.p.id}" class="th ${tone(l.p)}">${thumb(l.p)}</a>
-      <div><b><a href="producto.html?id=${l.p.id}">${prodName(l.p)}</a></b>
-        <small>${l.opt ? esc(l.opt) + " · " : ""}${money(l.p.price)} c/u</small>
+      <div><b><a href="producto.html?id=${l.p.id}">${esc(prodName(l.p))}</a></b>
+        <small>${inStock(l.p) ? "" : "<b style=\"color:#B42318;display:inline\">Sin stock</b> · "}${l.opt ? esc(l.opt) + " · " : ""}${money(l.p.price)} c/u</small>
         <div class="qty"><button data-i="${i}" data-d="-1" aria-label="Restar">−</button><span>${l.q}</span><button data-i="${i}" data-d="1" aria-label="Sumar">+</button></div></div>
       <div><div class="sub">${money(l.p.price * l.q)}</div><button class="rm" data-i="${i}" data-d="x">Quitar</button></div>
     </div>`).join("") + `<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:16px"><a href="catalogo.html" class="btn btn-line">← Seguir comprando</a><button class="btn btn-line" id="clear">Vaciar carrito</button></div>`;
@@ -97,7 +97,7 @@ $("#send").onclick = () => {
   msg += `\n\n¿Me confirman stock? Gracias!`;
   window.open(waLink(msg), "_blank");
 };
-render();
+READY.then(render);
 </script>
 </body>
 </html>
